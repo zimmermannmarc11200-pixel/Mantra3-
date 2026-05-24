@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Mes Mantras — Marc</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0c10;
+    --gold: #c9956a;
+    --gold-light: #e8b98a;
+    --gold-dim: rgba(201,149,106,0.15);
+    --text: #f0ece4;
+    --muted: rgba(240,236,228,0.45);
+    --card-bg: rgba(255,255,255,0.04);
+    --border: rgba(201,149,106,0.2);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Jost', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* Background ambient */
+  body::before {
+    content: '';
+    position: fixed;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100vw;
+    height: 80vh;
+    background: radial-gradient(ellipse at center, rgba(201,149,106,0.06) 0%, transparent 65%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* HEADER */
+  header {
+    padding: 52px 28px 20px;
+    text-align: center;
+  }
+  .header-label {
+    font-size: 10px;
+    letter-spacing: 3.5px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  header h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 400;
+    line-height: 1.2;
+    color: var(--text);
+  }
+  header h1 em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+
+  /* DATE & STREAK */
+  .meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    margin: 16px 28px;
+    padding: 12px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+  }
+  .meta-date { font-size: 12px; color: var(--muted); }
+  .meta-sep { width: 1px; height: 14px; background: var(--border); }
+  .streak-badge {
+    font-size: 12px;
+    color: var(--gold);
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .streak-num { font-size: 15px; font-weight: 600; font-family: 'Cormorant Garamond', serif; }
+
+  /* MAIN CARD AREA */
+  .card-area {
+    flex: 1;
+    padding: 0 20px;
+    position: relative;
+  }
+
+  /* MANTRA CARD */
+  .mantra-carousel {
+    position: relative;
+    height: 340px;
+    overflow: hidden;
+  }
+  .mantra-card {
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 40px 32px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.45s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease;
+    border: 1px solid var(--border);
+    will-change: transform, opacity;
+    user-select: none;
+  }
+  .mantra-card.active {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    z-index: 2;
+  }
+  .mantra-card.prev {
+    transform: translateX(-110%) scale(0.92);
+    opacity: 0;
+    z-index: 1;
+  }
+  .mantra-card.next {
+    transform: translateX(110%) scale(0.92);
+    opacity: 0;
+    z-index: 1;
+  }
+  .mantra-card.slide-out-left {
+    transform: translateX(-110%) scale(0.92);
+    opacity: 0;
+  }
+  .mantra-card.slide-out-right {
+    transform: translateX(110%) scale(0.92);
+    opacity: 0;
+  }
+  .mantra-card.slide-in-right {
+    animation: slideInRight 0.45s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  .mantra-card.slide-in-left {
+    animation: slideInLeft 0.45s cubic-bezier(0.4,0,0.2,1) forwards;
+  }
+  @keyframes slideInRight {
+    from { transform: translateX(110%) scale(0.92); opacity: 0; }
+    to { transform: translateX(0) scale(1); opacity: 1; }
+  }
+  @keyframes slideInLeft {
+    from { transform: translateX(-110%) scale(0.92); opacity: 0; }
+    to { transform: translateX(0) scale(1); opacity: 1; }
+  }
+
+  .card-number {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 24px;
+    font-weight: 500;
+  }
+  .card-symbol {
+    font-size: 36px;
+    margin-bottom: 20px;
+    opacity: 0.85;
+  }
+  .card-mantra {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--text);
+    margin-bottom: 18px;
+  }
+  .card-sub {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    font-weight: 300;
+    max-width: 260px;
+  }
+
+  /* Card color variants */
+  .card-0 { background: linear-gradient(145deg, #1a1208 0%, #12100e 100%); }
+  .card-1 { background: linear-gradient(145deg, #0d1318 0%, #0a0c10 100%); }
+  .card-2 { background: linear-gradient(145deg, #101618 0%, #0a0e10 100%); }
+  .card-3 { background: linear-gradient(145deg, #14100c 0%, #0f0c0a 100%); }
+  .card-4 { background: linear-gradient(145deg, #0e0e18 0%, #0a0a10 100%); }
+  .card-5 { background: linear-gradient(145deg, #0f1412 0%, #0a0e0c 100%); }
+  .card-6 { background: linear-gradient(145deg, #161010 0%, #100a0a 100%); }
+
+  /* DOTS */
+  .dots {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    margin: 18px 0 8px;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    transition: all 0.3s;
+    cursor: pointer;
+  }
+  .dot.active {
+    background: var(--gold);
+    width: 18px;
+    border-radius: 3px;
+  }
+
+  /* SWIPE HINT */
+  .swipe-hint {
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    opacity: 0.6;
+  }
+
+  /* RITUAL SECTION */
+  .section-title {
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 24px 20px 12px;
+    font-weight: 500;
+  }
+
+  .ritual-block {
+    margin: 0 20px 16px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .ritual-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(201,149,106,0.08);
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+  }
+  .ritual-item:last-child { border-bottom: none; }
+  .ritual-item:active { background: rgba(201,149,106,0.04); }
+  .ritual-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+    background: var(--gold-dim);
+  }
+  .ritual-text { flex: 1; }
+  .ritual-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .ritual-desc { font-size: 11px; color: var(--muted); }
+  .ritual-check {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    transition: all 0.25s;
+    flex-shrink: 0;
+  }
+  .ritual-check.done {
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--bg);
+  }
+
+  /* INTENTION */
+  .intention-block {
+    margin: 0 20px 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 16px 18px;
+  }
+  .intention-label {
+    font-size: 11px;
+    color: var(--gold);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .intention-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    resize: none;
+    min-height: 60px;
+    caret-color: var(--gold);
+  }
+  .intention-input::placeholder { color: var(--muted); }
+  .intention-save {
+    margin-top: 10px;
+    font-size: 11px;
+    color: var(--gold);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+    background: none;
+    border: none;
+    font-family: 'Jost', sans-serif;
+    padding: 0;
+  }
+  .intention-save:active { opacity: 1; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex;
+    padding: 12px 20px 28px;
+    gap: 10px;
+    background: linear-gradient(transparent, rgba(10,12,16,0.95));
+    position: sticky;
+    bottom: 0;
+  }
+  .nav-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 14px;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'Jost', sans-serif;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--card-bg);
+    color: var(--muted);
+    transition: all 0.2s;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .nav-btn.primary {
+    background: var(--gold);
+    color: var(--bg);
+    border-color: var(--gold);
+    font-weight: 600;
+    color: #1a0e06;
+  }
+  .nav-btn:active { transform: scale(0.97); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(201,149,106,0.95);
+    color: #1a0e06;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 10px 22px;
+    border-radius: 100px;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 999;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.85);
+    z-index: 500;
+    display: flex;
+    align-items: flex-end;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .modal {
+    width: 100%;
+    max-width: 430px;
+    margin: 0 auto;
+    background: #13110f;
+    border-radius: 24px 24px 0 0;
+    padding: 28px 24px 48px;
+    border-top: 1px solid var(--border);
+    transform: translateY(100%);
+    transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 40px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 24px;
+  }
+  .modal h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    margin-bottom: 6px;
+  }
+  .modal p {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .modal-list { list-style: none; }
+  .modal-list li {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-style: italic;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(201,149,106,0.08);
+    color: var(--text);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .modal-list li::before { content: '—'; color: var(--gold); flex-shrink: 0; margin-top: 1px; }
+  .modal-list li:last-child { border-bottom: none; }
+  .modal-close {
+    margin-top: 24px;
+    width: 100%;
+    padding: 14px;
+    background: var(--gold-dim);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    color: var(--gold);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Jost', sans-serif;
+    cursor: pointer;
+  }
+
+  /* Pulse animation for new day */
+  @keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(201,149,106,0.3); }
+    50% { box-shadow: 0 0 0 10px rgba(201,149,106,0); }
+  }
+  .pulse { animation: pulse-gold 2s ease infinite; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <header>
+    <div class="header-label">Carnet personnel</div>
+    <h1>Mes <em>mantras</em><br>du matin</h1>
+  </header>
+
+  <div class="meta-row">
+    <span class="meta-date" id="todayDate"></span>
+    <div class="meta-sep"></div>
+    <div class="streak-badge">
+      🔥 <span class="streak-num" id="streakNum">0</span> jour<span id="streakS"></span> de suite
+    </div>
+  </div>
+
+  <div class="card-area">
+    <div class="mantra-carousel" id="carousel"
+         ontouchstart="touchStart(event)"
+         ontouchend="touchEnd(event)">
+    </div>
+
+    <div class="dots" id="dots"></div>
+    <div class="swipe-hint">← glisser pour changer →</div>
+  </div>
+
+  <div class="section-title">Rituel du matin</div>
+
+  <div class="ritual-block">
+    <div class="ritual-item" onclick="toggleRitual(0)">
+      <div class="ritual-icon">💧</div>
+      <div class="ritual-text">
+        <div class="ritual-name">Grand verre d'eau</div>
+        <div class="ritual-desc">Dès le réveil, avant tout</div>
+      </div>
+      <div class="ritual-check" id="r0">✓</div>
+    </div>
+    <div class="ritual-item" onclick="toggleRitual(1)">
+      <div class="ritual-icon">✍️</div>
+      <div class="ritual-text">
+        <div class="ritual-name">Écrire mon mantra du jour</div>
+        <div class="ritual-desc">À la main ou dans le champ ci-dessous</div>
+      </div>
+      <div class="ritual-check" id="r1">✓</div>
+    </div>
+    <div class="ritual-item" onclick="toggleRitual(2)">
+      <div class="ritual-icon">🌬️</div>
+      <div class="ritual-text">
+        <div class="ritual-name">Respiration 4-7-8</div>
+        <div class="ritual-desc">4 inspirations × (4 sec / 7 sec / 8 sec)</div>
+      </div>
+      <div class="ritual-check" id="r2">✓</div>
+    </div>
+    <div class="ritual-item" onclick="toggleRitual(3)">
+      <div class="ritual-icon">🚶</div>
+      <div class="ritual-text">
+        <div class="ritual-name">Mon geste du jour</div>
+        <div class="ritual-desc">Une petite action concrète pour moi</div>
+      </div>
+      <div class="ritual-check" id="r3">✓</div>
+    </div>
+  </div>
+
+  <div class="section-title">Mon intention d'aujourd'hui</div>
+
+  <div class="intention-block">
+    <div class="intention-label">Aujourd'hui je choisis de…</div>
+    <textarea class="intention-input" id="intentionText" placeholder="écrire une intention libre…" rows="3"></textarea>
+    <button class="intention-save" onclick="saveIntention()">↗ Sauvegarder</button>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="nav-btn" onclick="openAllMantras()">Tous les mantras</button>
+    <button class="nav-btn primary pulse" id="doneBtn" onclick="markDayDone()">✓ Journée validée</button>
+  </div>
+</div>
+
+<!-- Modal tous les mantras -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>Tous mes mantras</h2>
+    <p>À lire, répéter, ou recopier. Chacun ancre une vérité sur toi.</p>
+    <ul class="modal-list" id="modalList"></ul>
+    <button class="modal-close" onclick="closeModalDirect()">Fermer</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const MANTRAS = [
+  {
+    symbol: "💧",
+    mantra: "Chaque jour, je fais un petit geste pour moi.",
+    sub: "Le changement se construit geste par geste, pas en un seul saut.",
+    color: 0
+  },
+  {
+    symbol: "🌱",
+    mantra: "Mon corps mérite que je prenne soin de lui.",
+    sub: "Il m'a porté jusqu'ici. Je lui dois cette attention.",
+    color: 1
+  },
+  {
+    symbol: "🚶",
+    mantra: "J'avance, même lentement. C'est avancer.",
+    sub: "La lenteur n'est pas un échec. L'immobilité seule l'est.",
+    color: 2
+  },
+  {
+    symbol: "✨",
+    mantra: "Je choisis aujourd'hui ce qui me fait du bien.",
+    sub: "Pas pour demain, pas pour −40 kg. Pour aujourd'hui.",
+    color: 3
+  },
+  {
+    symbol: "🔄",
+    mantra: "Je me respecte assez pour recommencer.",
+    sub: "Trébucher ne compte pas. Se relever, oui.",
+    color: 4
+  },
+  {
+    symbol: "💪",
+    mantra: "Je suis quelqu'un qui prend soin de sa santé.",
+    sub: "Cette identité se construit à chaque petit choix.",
+    color: 5
+  },
+  {
+    symbol: "🌅",
+    mantra: "Ce matin est un nouveau départ, toujours.",
+    sub: "Hier n'a aucun pouvoir sur ce matin.",
+    color: 6
+  }
+];
+
+let current = 0;
+let touchStartX = 0;
+let animating = false;
+
+// Storage helpers
+function getStorage(key, def) {
+  try { const v = localStorage.getItem(key); return v !== null ? JSON.parse(v) : def; }
+  catch { return def; }
+}
+function setStorage(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+// Date helpers
+function todayKey() {
+  return new Date().toISOString().split('T')[0];
+}
+function formatDate(d) {
+  return d.toLocaleDateString('fr-FR', { weekday:'long', day:'numeric', month:'long' });
+}
+
+// Init
+function init() {
+  document.getElementById('todayDate').textContent = formatDate(new Date());
+
+  // Build carousel
+  const carousel = document.getElementById('carousel');
+  carousel.innerHTML = '';
+  MANTRAS.forEach((m, i) => {
+    const card = document.createElement('div');
+    card.className = `mantra-card card-${m.color} ${i === 0 ? 'active' : 'next'}`;
+    card.innerHTML = `
+      <div class="card-number">Mantra ${String(i+1).padStart(2,'0')} / ${String(MANTRAS.length).padStart(2,'0')}</div>
+      <div class="card-symbol">${m.symbol}</div>
+      <div class="card-mantra">${m.mantra}</div>
+      <div class="card-sub">${m.sub}</div>
+    `;
+    carousel.appendChild(card);
+  });
+
+  // Build dots
+  const dots = document.getElementById('dots');
+  dots.innerHTML = '';
+  MANTRAS.forEach((_, i) => {
+    const dot = document.createElement('div');
+    dot.className = `dot ${i === 0 ? 'active' : ''}`;
+    dot.onclick = () => goTo(i);
+    dots.appendChild(dot);
+  });
+
+  // Restore rituals
+  const today = todayKey();
+  const rituals = getStorage('rituals_' + today, [false,false,false,false]);
+  rituals.forEach((done, i) => {
+    if (done) document.getElementById('r'+i).classList.add('done');
+  });
+
+  // Restore intention
+  const intention = getStorage('intention_' + today, '');
+  document.getElementById('intentionText').value = intention;
+
+  // Streak
+  updateStreak();
+
+  // Day done state
+  const dayDone = getStorage('done_' + today, false);
+  if (dayDone) {
+    const btn = document.getElementById('doneBtn');
+    btn.textContent = '✓ Fait aujourd\'hui';
+    btn.classList.remove('pulse');
+    btn.style.opacity = '0.7';
+  }
+
+  // Modal list
+  const list = document.getElementById('modalList');
+  list.innerHTML = MANTRAS.map(m => `<li>${m.mantra}</li>`).join('');
+
+  // Random mantra for today
+  const savedIdx = getStorage('mantra_idx_' + today, -1);
+  if (savedIdx >= 0) {
+    goTo(savedIdx, false);
+  } else {
+    const idx = Math.floor(Math.random() * MANTRAS.length);
+    setStorage('mantra_idx_' + today, idx);
+    goTo(idx, false);
+  }
+}
+
+function goTo(idx, animate = true) {
+  if (animating) return;
+  const cards = document.querySelectorAll('.mantra-card');
+  const dots = document.querySelectorAll('.dot');
+
+  if (!animate) {
+    cards.forEach((c, i) => {
+      c.className = `mantra-card card-${MANTRAS[i].color}`;
+      if (i === idx) c.classList.add('active');
+      else if (i < idx) c.classList.add('prev');
+      else c.classList.add('next');
+    });
+    current = idx;
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+    return;
+  }
+
+  const dir = idx > current ? 'right' : 'left';
+  animating = true;
+
+  cards[current].style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease';
+  cards[current].style.transform = dir === 'right' ? 'translateX(-110%) scale(0.92)' : 'translateX(110%) scale(0.92)';
+  cards[current].style.opacity = '0';
+
+  cards[idx].style.transition = 'none';
+  cards[idx].style.transform = dir === 'right' ? 'translateX(110%) scale(0.92)' : 'translateX(-110%) scale(0.92)';
+  cards[idx].style.opacity = '0';
+  cards[idx].style.zIndex = '3';
+
+  setTimeout(() => {
+    cards[idx].style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease';
+    cards[idx].style.transform = 'translateX(0) scale(1)';
+    cards[idx].style.opacity = '1';
+  }, 30);
+
+  setTimeout(() => {
+    cards.forEach((c, i) => {
+      c.style.transition = '';
+      c.style.transform = '';
+      c.style.opacity = '';
+      c.style.zIndex = '';
+      c.className = `mantra-card card-${MANTRAS[i].color}`;
+      if (i === idx) c.classList.add('active');
+      else if (i < idx) c.classList.add('prev');
+      else c.classList.add('next');
+    });
+    current = idx;
+    animating = false;
+    dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+  }, 440);
+}
+
+function next() { if (current < MANTRAS.length - 1) goTo(current + 1); else goTo(0); }
+function prev() { if (current > 0) goTo(current - 1); else goTo(MANTRAS.length - 1); }
+
+function touchStart(e) { touchStartX = e.touches[0].clientX; }
+function touchEnd(e) {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 40) { dx < 0 ? next() : prev(); }
+}
+
+function toggleRitual(idx) {
+  const today = todayKey();
+  const rituals = getStorage('rituals_' + today, [false,false,false,false]);
+  rituals[idx] = !rituals[idx];
+  setStorage('rituals_' + today, rituals);
+  const el = document.getElementById('r' + idx);
+  el.classList.toggle('done', rituals[idx]);
+  if (rituals[idx]) showToast('✓ Bien joué !');
+  checkAllRituals(rituals);
+}
+
+function checkAllRituals(rituals) {
+  if (rituals.every(Boolean)) showToast('🌟 Rituel complet !');
+}
+
+function saveIntention() {
+  const val = document.getElementById('intentionText').value.trim();
+  if (!val) return;
+  setStorage('intention_' + todayKey(), val);
+  showToast('↗ Intention sauvegardée');
+}
+
+function markDayDone() {
+  const today = todayKey();
+  const alreadyDone = getStorage('done_' + today, false);
+  if (alreadyDone) return;
+  setStorage('done_' + today, true);
+  updateStreak();
+  const btn = document.getElementById('doneBtn');
+  btn.textContent = '✓ Fait aujourd\'hui';
+  btn.classList.remove('pulse');
+  btn.style.opacity = '0.7';
+  showToast('🔥 Belle journée validée !');
+}
+
+function updateStreak() {
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 365; i++) {
+    const d = new Date(today);
+    d.setDate(d.getDate() - i);
+    const key = d.toISOString().split('T')[0];
+    if (getStorage('done_' + key, false)) streak++;
+    else break;
+  }
+  document.getElementById('streakNum').textContent = streak;
+  document.getElementById('streakS').textContent = streak > 1 ? 's' : '';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function openAllMantras() {
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModalDirect();
+}
+function closeModalDirect() {
+  document.getElementById('modalOverlay').classList.remove('open');
+}
+
+init();
+</script>
+</body>
+</html>
